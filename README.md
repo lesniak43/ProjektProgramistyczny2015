@@ -15,7 +15,7 @@ c - start/pause webcam
 s - save changes (warning! all unsaved changes are lost if you unpause the webcam or use keys '>', '<')
 i/u - rotate shape (warning! this action, if performed repeatedly, results in distiortions of points' coordinates)
 j/k/l/h - move shape
->/< - go to next/previous shapshot
+</> - go to next/previous shapshot
 + - make a copy of current snapshot and append it to the list of images
 e - equalize the snapshot (not recommended)
 z - show/hide edges
