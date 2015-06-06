@@ -55,7 +55,7 @@ Option 1:
     - run the 'train' executable
 
 Option 2:
-    - go to the 'img' directory
+    - go to the 'images' directory
     - remove all but one images (leave '1.jpg')
     - go to the 'data' directory
     - edit the 'shapes.txt' file
@@ -74,7 +74,7 @@ Option 3 (advanced, not tested, might require additional changes in the source c
         - shapes.txt - replace with a copy of 'reference_shape.txt'
         - triangles.txt - triangulate your 3D model, store each triangle (described by its vertices' numbers) in one row
     - edit the 'main.cpp' source file, delete (or replace) the code using 'face_cascade' to estimate position of the face
-    - go to the 'img' directory
+    - go to the 'images' directory
     - remove all but one images (leave '1.jpg')
     - run the 'get_data' executable to modify the first image and create new images
     - run the 'train' executable
