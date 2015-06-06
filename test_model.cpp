@@ -1,20 +1,17 @@
-#include <opencv2/opencv.hpp>
-#include <iostream>
-#include <stdio.h>
-#include <time.h>
-#include <string>
-#include <algorithm>
-#include <set>
 #include "utils.h"
-#include "consts.cpp"
 
 using namespace std;
 using namespace cv;
 
 int main()
 {
-    namedWindow("circ", WINDOW_AUTOSIZE);
-    namedWindow("3dhead", WINDOW_AUTOSIZE);
+    
+    Mat triangles = load_triangles();
+    Mat model3D = load_model3D();
+    
+    namedWindow("POSIT", WINDOW_AUTOSIZE);
+    namedWindow("Reconstructed face", WINDOW_AUTOSIZE);
+    namedWindow("Trackbars", WINDOW_AUTOSIZE);
 
     PCA pca = load_fs_pca("data/pca.fs");
     int tx = 400;
@@ -32,14 +29,15 @@ int main()
     for(int i=0; i<pca.eigenvalues.rows; i++)
     {
         parameters[i]=50;
-        char name[1] = {(char)(i+(int)'0')};
-        createTrackbar( name , "circ", trackbar_index, 100);
+        stringstream ss;
+        ss << i;
+        createTrackbar( ss.str() , "Trackbars", trackbar_index, 100);
         trackbar_index++;
     }
-    createTrackbar( "tx" , "circ", &tx, 800);
-    createTrackbar( "ty" , "circ", &ty, 600);
-    createTrackbar( "scale" , "circ", &scale, 2000);
-    createTrackbar( "angle" , "circ", &i_angle, 360);
+    createTrackbar( "tx" , "Trackbars", &tx, 800);
+    createTrackbar( "ty" , "Trackbars", &ty, 600);
+    createTrackbar( "scale" , "Trackbars", &scale, 2000);
+    createTrackbar( "angle" , "Trackbars", &i_angle, 360);
 
     while(true)
     {
@@ -52,7 +50,6 @@ int main()
             init.at<double>(0,i) = ((parameters[i]-50))*10*sqrt(pca.eigenvalues.at<double>(i,0));
         }
         init = init / 100;
-        
         Mat reconstructed_data = pca.backProject(init);
         
         Mat reconstructed_shape = Mat::zeros(1, shape_cols, CV_64F);
@@ -69,7 +66,7 @@ int main()
 
 
         Mat rec_face = Mat::zeros(480, 640, CV_8UC3);
-        vector<Point> face_points = load_2D_points_vector("data/face_points.txt");
+        vector<Point> face_points = load_2D_points_vector("data/points_inside_shape.txt");
         Mat m_face_shape = load_2D_mat("data/reference_shape.txt");
         vector<Point> face_shape;
         for(int i=0; i<m_face_shape.cols/2; i++) face_shape.push_back(Point(m_face_shape.at<double>(0,2*i),m_face_shape.at<double>(0,2*i+1)));
@@ -86,7 +83,6 @@ int main()
         for(unsigned int r = 0; r < reconstructed_shape.cols/2; r++)
         {
             circle(frame, Point(reconstructed_shape.at<double>(0,2*r), reconstructed_shape.at<double>(0,2*r+1)), 1, Scalar(255), 5);
-//            circle(frame, face_shape[r], 1, Scalar(100), 3);
         }
 
 
@@ -94,7 +90,7 @@ int main()
         std::vector<CvPoint3D32f> modelPoints;
         for(int i=0; i<58; i++)
         {
-            modelPoints.push_back(cvPoint3D32f(Model3D[i][0], Model3D[i][1], Model3D[i][2]));
+            modelPoints.push_back(cvPoint3D32f(model3D.at<double>(i,0), model3D.at<double>(i,1), model3D.at<double>(i,2)));
         }
         CvPOSITObject *positObject = cvCreatePOSITObject( &modelPoints[0], static_cast<int>(modelPoints.size()) );
 
@@ -114,9 +110,9 @@ int main()
         for(int i=0; i<58; i++)
         {
             Mat facepoint = Mat::zeros(3,1,CV_64F);
-            facepoint.at<double>(0,0) = Model3D[i][0] - Model3D[0][0];
-            facepoint.at<double>(1,0) = Model3D[i][1] - Model3D[0][1];
-            facepoint.at<double>(2,0) = Model3D[i][2] - Model3D[0][2];
+            facepoint.at<double>(0,0) = model3D.at<double>(i,0) - model3D.at<double>(0,0);
+            facepoint.at<double>(1,0) = model3D.at<double>(i,1) - model3D.at<double>(0,1);
+            facepoint.at<double>(2,0) = model3D.at<double>(i,2) - model3D.at<double>(0,2);
             facepoint = 15 * rotate * facepoint;
             dots.push_back(Point(facepoint.at<double>(0,0) + translation_vector[0], facepoint.at<double>(1,0) + translation_vector[1]));
         }
@@ -132,9 +128,8 @@ int main()
         delete rotation_matrix;
         delete translation_vector;
 
-        imshow("circ", frame);
-        imshow("3dhead", show_head);
-        imshow("onlyframe", frame);
+        imshow("POSIT", show_head);
+        imshow("Reconstructed face", frame);
 
         int pressed_key = waitKey(50);
         if ((char)pressed_key == 27) {

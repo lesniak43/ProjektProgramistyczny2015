@@ -1,19 +1,4 @@
-#include <string.h>
-#include <vector>
-#include <cmath>
-#include <stdio.h>
-#include <iostream>
-#include <fstream>
-
 #include "utils.h"
-#include "consts.cpp"
-
-#include "opencv2/opencv.hpp"
-#include "opencv2/highgui/highgui.hpp"
-#include "opencv2/objdetect/objdetect.hpp"
-#include "opencv2/imgproc/imgproc.hpp"
-#include "opencv2/features2d/features2d.hpp"
-#include <cvaux.h>
 
 using namespace std;
 using namespace cv;
@@ -37,6 +22,9 @@ std::vector< cv::Point2f > corners;
 
 int main(int argc, char** argv)
 {
+    
+    Mat triangles = load_triangles();
+    
     cap.open(-1);
     if(!cap.isOpened())
     {
@@ -90,11 +78,11 @@ int main(int argc, char** argv)
 // DISPLAY FACE TRIANGULATION
 
         if(flag_dots) for(unsigned int r = 0; r < corners.size(); r++)    circle(frame, corners[r], 1, Scalar(100,255,255), 1);
-        if(flag_lines) for(int i = 0; i < 95; i++)
+        if(flag_lines) for(int i = 0; i < triangles.rows; i++)
         {
-            line(frame, corners[triangles[i][0]], corners[triangles[i][1]], Scalar(255,255,255), 1, 4);
-            line(frame, corners[triangles[i][1]], corners[triangles[i][2]], Scalar(255,255,255), 1, 4);
-            line(frame, corners[triangles[i][2]], corners[triangles[i][0]], Scalar(255,255,255), 1, 4);
+            line(frame, corners[triangles.at<int>(i,0)], corners[triangles.at<int>(i,1)], Scalar(255,255,255), 1, 4);
+            line(frame, corners[triangles.at<int>(i,1)], corners[triangles.at<int>(i,2)], Scalar(255,255,255), 1, 4);
+            line(frame, corners[triangles.at<int>(i,2)], corners[triangles.at<int>(i,0)], Scalar(255,255,255), 1, 4);
         }
         stringstream ss;
         ss<<snapshot_number<<"/"<<shapes.rows;

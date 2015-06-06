@@ -12,9 +12,8 @@ ADD_EXECUTABLE( train train.cpp )
 ADD_EXECUTABLE( test_model test_model.cpp )
 
 add_library(utils utils.cpp)
-add_library(consts consts.cpp)
 
-TARGET_LINK_LIBRARIES( final  ${OpenCV_LIBS} utils consts)
-TARGET_LINK_LIBRARIES( get_data  ${OpenCV_LIBS} utils consts)
-TARGET_LINK_LIBRARIES( train  ${OpenCV_LIBS} utils consts)
-TARGET_LINK_LIBRARIES( test_model  ${OpenCV_LIBS} utils consts)
+TARGET_LINK_LIBRARIES( final  ${OpenCV_LIBS} utils)
+TARGET_LINK_LIBRARIES( get_data  ${OpenCV_LIBS} utils)
+TARGET_LINK_LIBRARIES( train  ${OpenCV_LIBS} utils)
+TARGET_LINK_LIBRARIES( test_model  ${OpenCV_LIBS} utils)
